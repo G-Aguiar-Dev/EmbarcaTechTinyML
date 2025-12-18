@@ -116,3 +116,132 @@ mkdir build
 cd build
 cmake ..
 make -j4
+```
+
+O processo de build irá:
+- Baixar e compilar a biblioteca pico-tflmicro (se não estiver na pasta `lib/`)
+- Compilar os arquivos do projeto
+- Gerar os binários `.uf2`, `.elf` e `.bin`
+
+---
+
+### 3. Faça o upload para o Pico W
+
+1. Segure o botão **BOOTSEL** no Pico W
+2. Conecte-o ao computador via USB
+3. Copie o arquivo `tiny_ml.uf2` (da pasta `build/`) para o drive que aparece
+4. O Pico W reiniciará automaticamente
+
+---
+
+### 4. Monitore a saída
+
+Use um terminal serial para ver os resultados:
+
+```bash
+# Linux/macOS
+screen /dev/ttyACM0 115200
+
+# Ou use minicom
+minicom -D /dev/ttyACM0 -b 115200
+```
+
+No Windows, use PuTTY ou outro terminal serial na porta COM correspondente.
+
+---
+
+## 📊 Saída esperada
+
+A aplicação exibe:
+
+- Status de inicialização do modelo
+- Dimensões dos tensores de entrada e saída
+- Primeiras 10 predições com scores de probabilidade
+- Matriz de confusão 3×3 completa
+- Acurácia final do modelo
+
+Exemplo:
+```
+=== TinyML wine - Matriz de Confusao ===
+Modelo inicializado com sucesso!
+Iniciando inferencia nas 150 amostras do dataset wine...
+
+Amostra   0  Real: 0  Pred: 0  [0.987 0.012 0.001]
+Amostra   1  Real: 0  Pred: 0  [0.991 0.008 0.001]
+...
+
+Matriz de Confusao (real vs predito)
+          Pred0   Pred1   Pred2
+Real 0       50        0        0
+Real 1        0       48        2
+Real 2        0        1       49
+
+Acuracia final: 0.9800  ( 147 / 150 )
+```
+
+---
+
+## 🔍 Detalhes técnicos
+
+### Estrutura do modelo
+- **Entrada**: 4 features (primeiras características do Wine dataset)
+- **Arquitetura**: MLP com camadas densas + ativações ReLU
+- **Saída**: 3 classes (Softmax)
+- **Formato**: TensorFlow Lite (.tflite convertido para array C)
+
+### Recursos utilizados
+- **Memória arena**: 8KB para tensores intermediários
+- **Modelo**: ~5KB (incluído no firmware)
+- **Dataset**: ~3KB embarcado
+- **Total estimado**: ~15-20KB de RAM
+
+### Limitações da implementação atual
+- Utiliza apenas as **primeiras 4 características** das 13 disponíveis no Wine dataset
+- Processa apenas as **primeiras 150 amostras** das 178 disponíveis
+- Modelo treinado com 4 features (versão simplificada)
+
+---
+
+## 🎓 Conceitos aprendidos
+
+Este projeto demonstra:
+
+1. **TinyML**: Machine Learning em microcontroladores
+2. **TFLite Micro**: Conversão e deploy de modelos TensorFlow
+3. **Normalização embarcada**: Pré-processamento de dados
+4. **Inferência on-device**: Processamento local sem nuvem
+5. **Avaliação de modelo**: Matriz de confusão e acurácia
+6. **Integração C/C++**: Wrapper para biblioteca C++ em código C
+
+---
+
+## 📚 Recursos adicionais
+
+- [TensorFlow Lite Micro](https://www.tensorflow.org/lite/microcontrollers)
+- [Raspberry Pi Pico SDK](https://github.com/raspberrypi/pico-sdk)
+- [Pico TFLite Micro](https://github.com/raspberrypi/pico-tflmicro)
+- [Wine Dataset (UCI)](https://archive.ics.uci.edu/ml/datasets/wine)
+- [Google Colab - Treinamento](https://colab.research.google.com/drive/1MnmXluBn_oCctJ-MPaiS2RxqsRbwg4Fk?usp=sharing)
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Sinta-se à vontade para:
+
+- Reportar bugs
+- Sugerir melhorias
+- Enviar pull requests
+- Melhorar a documentação
+
+---
+
+## 📄 Licença
+
+Este projeto é distribuído para fins educacionais como parte do programa EmbarcaTech.
+
+---
+
+## ✨ Autores
+
+Desenvolvido como material didático para demonstração de TinyML em microcontroladores.
