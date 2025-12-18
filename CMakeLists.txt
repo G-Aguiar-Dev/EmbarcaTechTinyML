@@ -22,6 +22,10 @@ set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
 if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
+
+# Force picotool to be fetched/built if SDK version mismatch detected.
+# This fixes errors like: "Incompatible picotool installation found: Requires version X, you have Y"
+set(PICOTOOL_FORCE_FETCH_FROM_GIT ON CACHE BOOL "Force fetching/building picotool from git when incompatible version is installed" FORCE)
 # ====================================================================================
 set(PICO_BOARD pico_w CACHE STRING "Board type")
 
@@ -33,11 +37,33 @@ project(tiny_ml C CXX ASM)
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
+# Define onboard LED pin for any code that expects PICO_DEFAULT_LED_PIN (quick workaround)
+add_compile_definitions(PICO_DEFAULT_LED_PIN=25)
+
+# Prefer a fast workaround: do not build pico-tflmicro examples (they pull in board-specific LED code)
+# This avoids errors about PICO_DEFAULT_LED_PIN and significantly reduces build time.
+set(PICO_TFLMICRO_BUILD_EXAMPLES OFF CACHE BOOL "Disable building pico-tflmicro examples" FORCE)
+
 # ----------------------------------------------------------------------
 # Usa o port oficial do TensorFlow Lite Micro para o Pico:
 #    lib/pico-tflmicro
 # ----------------------------------------------------------------------
-add_subdirectory(lib/pico-tflmicro EXCLUDE_FROM_ALL)
+if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/lib/pico-tflmicro/CMakeLists.txt")
+    add_subdirectory(lib/pico-tflmicro EXCLUDE_FROM_ALL)
+else()
+    include(FetchContent)
+    message(STATUS "lib/pico-tflmicro not found — fetching pico-tflmicro from GitHub")
+    FetchContent_Declare(
+        pico_tflmicro
+        GIT_REPOSITORY https://github.com/raspberrypi/pico-tflmicro.git
+        GIT_TAG main
+    )
+    # Populate source so we can control how the subdirectory is added (disable examples)
+    FetchContent_Populate(pico_tflmicro)
+    # Ensure examples are disabled in the pico-tflmicro build (fast)
+    set(PICO_TFLMICRO_BUILD_EXAMPLES OFF CACHE BOOL "Disable building pico-tflmicro examples" FORCE)
+    add_subdirectory(${pico_tflmicro_SOURCE_DIR} ${pico_tflmicro_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 # ❌ NÃO usar mais o repositório tflite-micro puro (não tem CMakeLists)
 # add_subdirectory(tflite-micro)

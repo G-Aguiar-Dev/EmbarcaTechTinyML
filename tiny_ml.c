@@ -40,7 +40,7 @@ int main() {
 
     // Inicializa printf via USB no Pico W
     stdio_init_all();
-    sleep_ms(1500);
+    sleep_ms(5000);
 
     printf("\n=== TinyML wine - Matriz de Confusao ===\n");
 
