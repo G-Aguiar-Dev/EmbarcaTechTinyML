@@ -56,7 +56,7 @@ Wrapper em C/C++ para o TensorFlow Lite Micro. Forma uma camada de abstração q
 - Registra operações necessárias (FullyConnected, ReLU, Softmax, Reshape).  
 - Expõe:
   - `tflm_init_model()`  
-  - `tflm_infer(float input[4], float output[3])` - Utiliza as primeiras 4 características do Wine
+  - `tflm_infer(float input[4], float output[3])` - Utiliza as primeiras 4 características: Alcohol, Malic acid, Ash e Alcalinity of ash
 
 ---
 
