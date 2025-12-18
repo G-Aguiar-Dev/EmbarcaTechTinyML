@@ -184,7 +184,11 @@ Acuracia final: 0.9800  ( 147 / 150 )
 ## 🔍 Detalhes técnicos
 
 ### Estrutura do modelo
-- **Entrada**: 4 features (primeiras características do Wine dataset)
+- **Entrada**: 4 features das primeiras características do Wine dataset:
+  1. Alcohol
+  2. Malic acid
+  3. Ash
+  4. Alcalinity of ash
 - **Arquitetura**: MLP com camadas densas + ativações ReLU
 - **Saída**: 3 classes (Softmax)
 - **Formato**: TensorFlow Lite (.tflite convertido para array C)
