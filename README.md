@@ -1,4 +1,4 @@
-# TinyML – Classificação do Dataset Iris no Raspberry Pi Pico W  
+# TinyML – Classificação do Dataset Wine no Raspberry Pi Pico W  
 ### Prática com Rede Neural Artificial (RNA) para Microcontroladores
 
 Este projeto implementa uma **Rede Neural Artificial (RNA)**, Perceptron Multicamadas (MLP), embarcada no **Raspberry Pi Pico W**, utilizando a biblioteca **TensorFlow Lite Micro (TFLM)** para executar inferência diretamente no microcontrolador — abordagem típica de **TinyML**.
@@ -23,9 +23,9 @@ Este código faz parte de um projeto que demonstra como treinar, converter e exe
 
 A aplicação embarcada no Pico W:
 
-1. Carrega um modelo **MLP (rede neural multicamadas)** treinado com o dataset Iris.
-2. Aplica normalização padrão (média e desvio).
-3. Executa inferência amostra por amostra (150).
+1. Carrega um modelo **MLP (rede neural multicamadas)** treinado com o dataset Wine.
+2. Aplica normalização padrão (média e desvio) nas primeiras 4 características.
+3. Executa inferência nas primeiras 150 amostras do dataset.
 4. Constrói a **matriz de confusão 3×3** (real × predito).
 5. Calcula a acurácia final da rede.
 6. Exibe tudo via USB/serial.
@@ -36,13 +36,13 @@ Essa prática permite que estudantes compreendam como modelos inteligentes podem
 
 ## 📁 Organização dos arquivos
 
-### `tiny_ml_02.c`
+### `tiny_ml.c`
 Aplicação principal em C.  
 Responsável por:
 
 - Inicializar o Pico W e o ambiente TFLM.  
-- Normalizar cada amostra com `iris_means` e `iris_stds`.  
-- Realizar inferências via `tflm_infer()`.  
+- Normalizar as primeiras 4 características de cada amostra com `wine_means` e `wine_stds`.  
+- Realizar inferências nas primeiras 150 amostras via `tflm_infer()`.  
 - Construir a matriz de confusão.  
 - Calcular a acurácia e imprimir os resultados.
 
@@ -52,34 +52,43 @@ Responsável por:
 Wrapper em C/C++ para o TensorFlow Lite Micro. Forma uma camada de abstração que encapsula o TensorFlow Lite Micro, oferecendo funções simples para inicializar o modelo, passar entradas e pegar saídas, sem que você precise lidar diretamente com todos os detalhes internos da biblioteca.
 
 - Configura a arena de tensores.  
-- Carrega o modelo embarcado (`iris_mlp_float_tflite`).  
-- Registra operações necessárias (Dense, ReLU, Softmax).  
+- Carrega o modelo embarcado (`wine_mlp_float_tflite`).  
+- Registra operações necessárias (FullyConnected, ReLU, Softmax, Reshape).  
 - Expõe:
   - `tflm_init_model()`  
-  - `tflm_infer(float input[4], float output[3])`
+  - `tflm_infer(float input[4], float output[3])` - Utiliza as primeiras 4 características do Wine
 
 ---
 
-### `iris_mlp_float.h`
+### `wine_mlp_float.h`
 Modelo TFLite convertido para array C (`unsigned char[]`), contendo a rede neural MLP treinada previamente em Python.
 
 ---
 
-### `iris_dataset.h`
-Dataset Iris embarcado no firmware:
+### `wine_dataset.h`
+Dataset Wine embarcado no firmware:
 
-- `iris_features[150][4]`  
-- `iris_labels[150]`
+- `wine_features[178][13]` - 178 amostras com 13 características cada
+- `wine_labels[178]` - Classes correspondentes (0, 1 ou 2)
+
+O dataset Wine contém 13 atributos químicos de vinhos italianos:
+- Alcohol, Malic acid, Ash, Alcalinity of ash, Magnesium
+- Total phenols, Flavanoids, Nonflavanoid phenols, Proanthocyanins
+- Color intensity, Hue, OD280/OD315 of diluted wines, Proline
+
+**Nota**: A implementação atual utiliza apenas as primeiras 4 características do dataset para a inferência.
 
 ---
 
-### `iris_normalization.h`
+### `wine_normalization.h`
 Estatísticas de normalização utilizadas:
 
-- `iris_means[4]`  
-- `iris_stds[4]`
+- `wine_means[13]` - Média de cada atributo
+- `wine_stds[13]` - Desvio padrão de cada atributo
 
 Esses valores replicam exatamente o StandardScaler do treinamento, garantindo consistência na inferência.
+
+**Nota**: A implementação atual utiliza apenas as primeiras 4 médias e desvios padrão.
 
 ---
 
