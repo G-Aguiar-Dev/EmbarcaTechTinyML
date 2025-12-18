@@ -68,7 +68,7 @@ Modelo TFLite convertido para array C (`unsigned char[]`), contendo a rede neura
 ### `wine_dataset.h`
 Dataset Wine embarcado no firmware:
 
-- `wine_features[178][13]` - 178 amostras com 13 características cada
+- `wine_features[178][13]` - Array completo com 178 amostras e 13 características cada
 - `wine_labels[178]` - Classes correspondentes (0, 1 ou 2)
 
 O dataset Wine contém 13 atributos químicos de vinhos italianos:
@@ -76,19 +76,19 @@ O dataset Wine contém 13 atributos químicos de vinhos italianos:
 - Total phenols, Flavanoids, Nonflavanoid phenols, Proanthocyanins
 - Color intensity, Hue, OD280/OD315 of diluted wines, Proline
 
-**Nota**: A implementação atual utiliza apenas as primeiras 4 características do dataset para a inferência.
+**⚠️ Nota importante**: A implementação atual utiliza apenas as **primeiras 4 características** (Alcohol, Malic acid, Ash, Alcalinity of ash) e as **primeiras 150 amostras** do dataset completo para a inferência.
 
 ---
 
 ### `wine_normalization.h`
 Estatísticas de normalização utilizadas:
 
-- `wine_means[13]` - Média de cada atributo
-- `wine_stds[13]` - Desvio padrão de cada atributo
+- `wine_means[13]` - Array com a média de cada um dos 13 atributos
+- `wine_stds[13]` - Array com o desvio padrão de cada um dos 13 atributos
 
 Esses valores replicam exatamente o StandardScaler do treinamento, garantindo consistência na inferência.
 
-**Nota**: A implementação atual utiliza apenas as primeiras 4 médias e desvios padrão.
+**⚠️ Nota importante**: A implementação atual utiliza apenas os **primeiros 4 valores** de cada array (correspondentes às 4 características usadas na inferência).
 
 ---
 
